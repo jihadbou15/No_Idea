@@ -44,7 +44,3 @@ void Player::Update(float elapsedSec, bool jumpState)
 
 }
 
-Point2f Player::GivePlayerPos()
-{
-
-}

@@ -32,7 +32,6 @@ void Game::Update( float elapsedSec )
 	{
 		m_TotalElapsedSec += elapsedSec;
 		Player1.Update(m_TotalElapsedSec, m_JumpState);
-		if(Player1.)
 	}
 	else
 	{
