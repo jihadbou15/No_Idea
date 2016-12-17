@@ -1,13 +1,16 @@
 #include "stdafx.h"
 #include "Game.h"
 
-Player Player1{ 50.0f,50.0f };
+#include "utils.h"
 
 
-Game::Game( const Window& window ) 
+
+Game::Game(const Window& window)
 	:m_Window{ window }
+	,m_Player1{ 50.0f,(32.0f*2.0f) }
 {
-	Initialize( );
+	Initialize();
+	
 }
 
 Game::~Game( )
@@ -17,21 +20,39 @@ Game::~Game( )
 
 void Game::Initialize( )
 {
-
+	Rectf floorTexBase{ Element::GetSize()*2.0f,Element::GetSize() * 2,Element::GetSize(),Element::GetSize()};
+	Rectf floorWorld{ 0.0f,0.0f,Element::GetSize() * 2.0f,Element::GetSize() * 2.0f };
+	int rows{ 2 };
+	int columns{ 50 };
+	for (int i = 0; i < rows; i++)
+	{
+		for (int j = 0; j < columns; j++)
+		{
+			m_pLevelFloor[dae::GetIndex(i, j, columns)] = new Element{ floorTexBase,floorWorld };
+			floorWorld.left += floorWorld.width;
+		}
+		floorWorld.left = 0.0f;
+		floorWorld.bottom += floorWorld.height;
+		floorTexBase.bottom -= floorTexBase.height;
+	}
 }
 
 void Game::Cleanup( )
 {
+	for (int i = 0; i < m_NrElements; i++)
+	{
+		delete m_pLevelFloor[i];
+		m_pLevelFloor[i] = nullptr;
+	}
 }
 
 void Game::Update( float elapsedSec )
 {
-	
 
 	if (m_JumpState == true)
 	{
 		m_TotalElapsedSec += elapsedSec;
-		Player1.Update(m_TotalElapsedSec, m_JumpState);
+		m_Player1.Update(m_TotalElapsedSec, m_JumpState);
 	}
 	else
 	{
@@ -42,8 +63,12 @@ void Game::Update( float elapsedSec )
 void Game::Draw( )
 {
 	ClearBackground( );
+	m_Player1.Draw();
 
-	Player1.Draw();
+	for (int i = 0; i < m_NrElements; i++)
+	{
+		m_pLevelFloor[i]->Draw();
+	}
 }
 
 void Game::ProcessKeyDownEvent( const SDL_KeyboardEvent & e )

@@ -1,20 +1,29 @@
 #pragma once
-#include "Texture.h"
+
+class Texture;
 
 class Element
 {
 public:
-	static Texture m_Tex;
-	
-	Element();
+	Element(Rectf texPart, Rectf rectWorld);
+	Element(Point2f pos, Rectf rectWorld);
 	
 	void Draw();
-	
+	void SetTextPart(Rectf textPart);
+	void SetRectWorld(Rectf rectWorld);
+	void SetDisplay(bool isDisplayed);
+
+	static float GetSize();
 	~Element();
 
 private:
+	
+	static float m_TextPartSize;
+
 	Rectf m_TexPart;
 	Rectf m_RectWorld;
-
+	bool m_IsDisplayed;
+	static Texture* m_pTex;
+	static int m_InstanceCounter;
 };
 

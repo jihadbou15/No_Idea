@@ -31,4 +31,6 @@ namespace dae
 	void DrawPolygon( Point2f *pVertices, int nrVertices, bool closed = true, float lineWidth = 1.0f );
 	void FillPolygon( Point2f *pVertices, int nrVertices);
 
+
+	int GetIndex(int iRow, int iColumn, int columns);
 }
