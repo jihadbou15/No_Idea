@@ -5,6 +5,7 @@
 Texture* Player::m_pTex{ nullptr };
 int Player::m_InstanceCounter{};
 
+
 Player::Player()
 	:m_Pos{10.0f,10.0f}
 {
@@ -12,7 +13,7 @@ Player::Player()
 
 Player::Player(float x, float y)
 	:m_Pos{x,y},
-	 m_Frame{0.0f,0.0f,m_TexPartSize,m_TexPartSize}
+	 m_Frame{0.0f,0.0f,25.0f,25.0f}
 {
 	
 	if (m_InstanceCounter == 0)
@@ -37,6 +38,23 @@ void Player::Draw()
 {
 	if (m_pTex->IsCreationOk())
 	{
+		if (m_AttackState)
+		{
+			CheckAttackFrame();
+		}
+		else if (m_JumpState)
+		{
+			CheckJumpFrame();
+		}
+		else if (m_RunState != Direction::Stationary)
+		{
+			CheckRunFrame();
+		}
+		else
+		{
+			m_Frame.bottom = m_TexPartSize;
+			m_Frame.left = 0.0f;
+		}
 		m_pTex->Draw(Rectf{m_Pos.x,m_Pos.y,m_TexPartSize,m_TexPartSize}, m_Frame);
 	}
 	else
@@ -53,17 +71,217 @@ void Player::Draw()
 	
 }
 
-void Player::Update(float elapsedSec, bool jumpState)
+void Player::Update(float elapsedSec, float totalElapsedSec, float ground)
 {
-	if (jumpState = true)
+	float speed{};
+	switch (m_RunState)
 	{
-		m_Pos.y += (m_JumpVelocity - (5.0f*elapsedSec));
-		if (m_Pos.y <= 10.0f)
+	case Direction::Stationary:
+		break;
+	case Direction::Left:
+		speed = -m_Speed;
+		
+		break;
+	case Direction::Right:
+		speed = m_Speed;
+		break;
+	}
+	if (m_AttackState)
+	{
+		m_aFrameCounter++;
+		if (m_aFrameCounter >30)
 		{
-			m_Pos.y = 10.0f;
-
+			m_AttackFrameNr++;
+			if (m_AttackFrameNr > 3)
+			{
+				m_AttackFrameNr = 0;
+				m_AttackState = false;
+			}
+			m_aFrameCounter = 0;
 		}
+		
+	}
+	if (m_JumpState)
+	{
+		if (m_AttackState)
+		{
+			m_JumpFrameNr = 0;
+			m_Pos.y += (m_JumpVelocity - (5.0f*totalElapsedSec));
+			if (m_Pos.y <= ground)
+			{
+				m_Pos.y = ground;
+				m_JumpFrameNr = 3;
+				m_JumpState = false;
+			}
+		}
+		else
+		{
+			m_RunFrameNr = 0;
+			m_Pos.y += (m_JumpVelocity - (5.0f*totalElapsedSec));
+			if (m_JumpVelocity - (5.0f*totalElapsedSec) > 0)
+			{
+				m_JumpFrameNr = 1;
+			}
+			else
+			{
+				m_JumpFrameNr = 2;
+			}
+	
+			if (m_Pos.y <= ground)
+			{
+				m_Pos.y = ground;
+				m_JumpFrameNr = 3;
+				m_JumpState = false;
+			}
+		}
+		
 	}
 
+	if (m_RunState != Direction::Stationary)
+	{
+		if (m_JumpState)
+		{
+			m_RunFrameNr = 0;
+		}
+		else
+		{
+			m_rFrameCounter++;
+			if (m_rFrameCounter > 30)
+			{
+				m_RunFrameNr++;
+				if (m_RunFrameNr > 8)
+				{
+					m_RunFrameNr = 1;
+				}
+				
+			}
+			
+		}
+		
+		m_Pos.x += speed*elapsedSec;
+	}
+}
+
+bool Player::GetJumpState()
+{
+	return m_JumpState;
+}
+
+Direction Player::GetRunState()
+{
+	return m_RunState;
+}
+
+bool Player::GetAttackState()
+{
+	return m_AttackState;
+}
+
+void Player::SetJumpState(bool newJS)
+{
+	m_JumpState = newJS;
+}
+
+void Player::SetRunState(Direction newRS)
+{
+	m_RunState = newRS;
+}
+
+void Player::SetAttackState(bool newAS)
+{
+	m_AttackState = newAS;
+}
+
+void Player::CheckJumpFrame()
+{
+	switch (m_JumpFrameNr)
+	{
+	case 0:
+		break;
+
+	case 1:
+		m_Frame.bottom =0.0f;
+		m_Frame.left = m_TexPartSize;
+		break;
+
+	case 2:
+		m_Frame.bottom = 0.0f;
+		m_Frame.left = m_TexPartSize*2;
+		break;
+
+	case 3:
+		m_Frame.bottom =0.0f;
+		m_Frame.left = m_TexPartSize*3;
+		break;
+	
+	default:
+		break;
+	}
+}
+
+void Player::CheckRunFrame()
+{
+	switch (m_RunFrameNr)
+	{
+	case 0:
+		break;
+
+	case 1:
+		m_Frame.bottom = m_TexPartSize;
+		m_Frame.left = 0.0f;
+		break;
+
+	case 2:
+		m_Frame.bottom = m_TexPartSize;
+		m_Frame.left = m_TexPartSize;
+
+	case 3:
+		m_Frame.bottom = m_TexPartSize;
+		m_Frame.left = m_TexPartSize * 2;
+
+	case 4:
+		m_Frame.bottom = m_TexPartSize;
+		m_Frame.left = m_TexPartSize * 3;
+
+	case 5:
+		m_Frame.bottom = m_TexPartSize;
+		m_Frame.left = m_TexPartSize * 4;
+
+	case 6:
+		m_Frame.bottom = m_TexPartSize;
+		m_Frame.left = m_TexPartSize * 5;
+
+	case 7:
+		m_Frame.bottom = m_TexPartSize;
+		m_Frame.left = m_TexPartSize * 6;
+
+	case 8:
+		m_Frame.bottom = m_TexPartSize;
+		m_Frame.left = m_TexPartSize * 7;
+	}
+}
+
+void Player::CheckAttackFrame()
+{
+	switch (m_AttackFrameNr)
+	{
+	case 0:
+		break;
+
+	case 1:
+		m_Frame.bottom = m_TexPartSize*2;
+		m_Frame.left = m_TexPartSize * 4;
+		break;
+
+	case 2:
+		m_Frame.bottom = m_TexPartSize * 2;
+		m_Frame.left = m_TexPartSize * 5;
+		break;
+
+	case 3:
+		m_Frame.bottom = m_TexPartSize * 2;
+		m_Frame.left = m_TexPartSize * 6;
+		break;
+	}
 }
 

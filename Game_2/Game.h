@@ -32,13 +32,13 @@ private:
 
 	//Player
 	Player m_Player1;
-	bool m_JumpState{ false };
 	float m_TotalElapsedSec;
 
 	//Level
 	static const int m_NrElements{ 100 };
 	Element* m_pLevelFloor[m_NrElements];
 
+	//
 
 	// FUNCTIONS
 	void Initialize( );

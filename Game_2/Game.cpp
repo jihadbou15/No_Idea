@@ -6,11 +6,11 @@
 
 
 Game::Game(const Window& window)
-	:m_Window{ window }
-	,m_Player1{ 50.0f,(32.0f*2.0f) }
+	:m_Window{ window },
+	m_Player1{ 50.0f,(32.0f*2.0f) }
 {
 	Initialize();
-	
+	;
 }
 
 Game::~Game( )
@@ -49,15 +49,17 @@ void Game::Cleanup( )
 void Game::Update( float elapsedSec )
 {
 
-	if (m_JumpState == true)
+	if (m_Player1.GetJumpState())
 	{
 		m_TotalElapsedSec += elapsedSec;
-		m_Player1.Update(m_TotalElapsedSec, m_JumpState);
+		m_Player1.Update(elapsedSec,m_TotalElapsedSec, float{ (m_pLevelFloor[50]->GetPos().y) + m_pLevelFloor[50]->GetHeight()});
 	}
 	else
 	{
 		m_TotalElapsedSec = 0;
+		m_Player1.Update(elapsedSec,m_TotalElapsedSec, float{ (m_pLevelFloor[50]->GetPos().y) + m_pLevelFloor[50]->GetHeight() });
 	}
+
 }
 
 void Game::Draw( )
@@ -76,32 +78,45 @@ void Game::ProcessKeyDownEvent( const SDL_KeyboardEvent & e )
 	std::cout << "KEYDOWN event: " << e.keysym.sym << std::endl;
 	switch (e.keysym.sym)
 	{
-	case SDLK_SPACE:
+	case SDLK_UP:
 		std::cout << "Jump" << std::endl;
-		if (m_JumpState==false)
+		if (!m_Player1.GetJumpState())
 		{
-			m_JumpState = true;
+			m_Player1.SetJumpState(true);
 		}
 		break;
+	case SDLK_LEFT:
+		std::cout << "Left" << std::endl;
+		m_Player1.SetRunState(Direction::Left);
+		break;
+	case SDLK_RIGHT:
+		std::cout << "Right" << std::endl;
+		m_Player1.SetRunState(Direction::Right);
+		break;
+	case SDLK_z:
+		std::cout << "Attack" << std::endl;
+		m_Player1.SetAttackState(true);
 	}
 }
 
 void Game::ProcessKeyUpEvent( const SDL_KeyboardEvent& e )
 {
-	//std::cout << "KEYUP event: " << e.keysym.sym << std::endl;
-	//switch ( e.keysym.sym )
-	//{
-	//case SDLK_LEFT:
-	//	//std::cout << "Left arrow key released\n";
-	//	break;
-	//case SDLK_RIGHT:
-	//	//std::cout << "`Right arrow key released\n";
-	//	break;
-	//case SDLK_1:
-	//case SDLK_KP_1:
-	//	//std::cout << "Key 1 released\n";
-	//	break;
-	//}
+	std::cout << "KEYUP event: " << e.keysym.sym << std::endl;
+	switch ( e.keysym.sym )
+	{
+	case SDLK_LEFT:
+		//std::cout << "Left arrow key released\n";
+		m_Player1.SetRunState(Direction::Stationary);
+		break;
+	case SDLK_RIGHT:
+		//std::cout << "`Right arrow key released\n";
+		m_Player1.SetRunState(Direction::Stationary);
+		break;
+	case SDLK_1:
+	case SDLK_KP_1:
+		//std::cout << "Key 1 released\n";
+		break;
+	}
 }
 
 void Game::ProcessMouseMotionEvent( const SDL_MouseMotionEvent& e )

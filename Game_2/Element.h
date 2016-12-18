@@ -12,8 +12,11 @@ public:
 	void SetTextPart(Rectf textPart);
 	void SetRectWorld(Rectf rectWorld);
 	void SetDisplay(bool isDisplayed);
-
+	Point2f GetPos();
+	float GetWidth();
+	float GetHeight();
 	static float GetSize();
+
 	~Element();
 
 private:

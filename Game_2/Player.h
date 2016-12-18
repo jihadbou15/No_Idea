@@ -1,27 +1,56 @@
 #pragma once
 class Texture;
 
+enum class Direction
+{
+	Stationary, Left, Right,
+};
 
 class Player
 {
 public:
 	Player();
 	Player(float x, float y);
-
 	~Player();
+	
 	void Draw();
-	void Update(float elapsedSec, bool jumpState);
+	void Update(float elapsedSec, float totalElapsedSec, float ground);
+
+	bool GetJumpState();
+	Direction GetRunState();
+	bool GetAttackState();
+
+	void SetJumpState(bool newJS);
+	void SetRunState(Direction newRS);
+	void SetAttackState(bool newAS);
+
+	void CheckJumpFrame();
+	void CheckRunFrame();
+	void CheckAttackFrame();
+
 
 private:
 	static Texture *m_pTex;
 	static int m_InstanceCounter;
 
-	const float m_TexPartSize{ 25.0f };
-
+	int m_aFrameCounter{};
+	int m_rFrameCounter{};
 	Point2f m_Pos;
-	float m_JumpVelocity{5.0f};
-	float m_Speed{ 10.0f };
-	int m_FrameNr{};
 	Rectf m_Frame;
+	
+	float m_JumpVelocity{5.0f};
+	float m_Speed{100.0f };
+
+	const float m_TexPartSize{ 28.0f };
+	int m_RunFrameNr{};
+	int m_JumpFrameNr{};
+	int m_AttackFrameNr{};
+	
+
+	bool m_JumpState{};
+	bool m_AttackState{};
+	bool m_Flipped{};
+
+	Direction m_RunState{};
 };
 

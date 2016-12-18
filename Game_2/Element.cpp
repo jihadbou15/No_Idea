@@ -48,6 +48,21 @@ void Element::SetDisplay(bool isDisplayed)
 	m_IsDisplayed = isDisplayed;
 }
 
+Point2f Element::GetPos()
+{
+	return Point2f(m_RectWorld.left,m_RectWorld.bottom);
+}
+
+float Element::GetWidth()
+{
+	return m_RectWorld.width;
+}
+
+float Element::GetHeight()
+{
+	return m_RectWorld.height;
+}
+
 
 float Element::GetSize()
 {
