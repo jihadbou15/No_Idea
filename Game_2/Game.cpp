@@ -2,7 +2,7 @@
 #include "Game.h"
 
 Player Player1{ 50.0f,50.0f };
-
+Surface Surface1{700.0f,50.0f};
 
 Game::Game( const Window& window ) 
 	:m_Window{ window }
@@ -26,18 +26,41 @@ void Game::Cleanup( )
 
 void Game::Update( float elapsedSec )
 {
-	
+	m_TotalElapsedSec += elapsedSec;
+
+	Point2f PlayerPos{  };
 
 	if (m_JumpState == true)
 	{
-		m_TotalElapsedSec += elapsedSec;
-		Player1.Update(m_TotalElapsedSec, m_JumpState);
-		if(Player1.)
+		
+		Player1.Update(m_TotalElapsedSec, m_JumpState, m_CameraPos.x);
+		PlayerPos = Player1.GivePlayerPos();
+		if (PlayerPos.y <= 10)
+		{
+			m_JumpState = false;
+		}
+
 	}
 	else
 	{
+
 		m_TotalElapsedSec = 0;
 	}
+
+	Player1.Move(m_LeftState, m_RightState,m_BorderRight);
+	PlayerPos=Player1.GivePlayerPos();
+	if (PlayerPos.x >= (m_Window.width / 2 + 20))
+	{
+		++m_CameraPos.x;
+		m_BorderRight = true;
+		PlayerPos.x = (m_Window.width / 2 + 20);
+		
+	}
+	else
+	{
+		m_BorderRight = false;
+	}
+	Surface1.Update(m_CameraPos);
 }
 
 void Game::Draw( )
@@ -45,6 +68,7 @@ void Game::Draw( )
 	ClearBackground( );
 
 	Player1.Draw();
+	Surface1.Draw();
 }
 
 void Game::ProcessKeyDownEvent( const SDL_KeyboardEvent & e )
@@ -59,17 +83,39 @@ void Game::ProcessKeyDownEvent( const SDL_KeyboardEvent & e )
 			m_JumpState = true;
 		}
 		break;
+	case SDLK_d:
+		std::cout << "Left" << std::endl;
+		if (m_LeftState == false)
+		{
+			m_LeftState = true;
+		}
+		break;
+	case SDLK_a:
+		if (m_RightState == false)
+		{
+			m_RightState = true;
+		}
+		break;
 	}
 }
 
 void Game::ProcessKeyUpEvent( const SDL_KeyboardEvent& e )
 {
 	//std::cout << "KEYUP event: " << e.keysym.sym << std::endl;
-	//switch ( e.keysym.sym )
-	//{
-	//case SDLK_LEFT:
-	//	//std::cout << "Left arrow key released\n";
-	//	break;
+	switch ( e.keysym.sym )
+	{
+	case SDLK_d:
+		if (m_LeftState == true)
+		{
+			m_LeftState = false;
+		}
+	break;
+	case SDLK_a:
+		if (m_RightState == true)
+		{
+			m_RightState = false;
+		}
+		break;
 	//case SDLK_RIGHT:
 	//	//std::cout << "`Right arrow key released\n";
 	//	break;
@@ -77,7 +123,7 @@ void Game::ProcessKeyUpEvent( const SDL_KeyboardEvent& e )
 	//case SDLK_KP_1:
 	//	//std::cout << "Key 1 released\n";
 	//	break;
-	//}
+	}
 }
 
 void Game::ProcessMouseMotionEvent( const SDL_MouseMotionEvent& e )

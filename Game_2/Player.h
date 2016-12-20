@@ -7,7 +7,8 @@ public:
 
 	~Player();
 	void Draw();
-	void Update(float elapsedSec, bool jumpState);
+	void Update(float elapsedSec, bool jumpState, float Camera);
+	void Move(bool leftState, bool rightState, bool borderRight);
 
 	Point2f GivePlayerPos();
 

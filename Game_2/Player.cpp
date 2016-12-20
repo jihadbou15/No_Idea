@@ -30,7 +30,7 @@ void Player::Draw()
 	glEnd();
 }
 
-void Player::Update(float elapsedSec, bool jumpState)
+void Player::Update(float elapsedSec, bool jumpState, float Camera)
 {
 	if (jumpState = true)
 	{
@@ -46,5 +46,21 @@ void Player::Update(float elapsedSec, bool jumpState)
 
 Point2f Player::GivePlayerPos()
 {
+	return(m_Pos);
+}
 
+void Player::Move(bool leftState, bool rightState, bool borderRight)
+{
+	if (borderRight == false)
+	{
+		if (leftState == true)
+		{
+			++m_Pos.x;
+		}
+		else
+			if (rightState == true)
+			{
+				--m_Pos.x;
+			}
+	}
 }

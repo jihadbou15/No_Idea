@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include "Player.h"
+#include "Surface.h"
 class Game
 {
 public:
@@ -24,6 +25,10 @@ private:
 	Window m_Window;
 
 	bool m_JumpState{ false };
+	bool m_LeftState{ false };
+	bool m_RightState{ false };
+	bool m_BorderRight{ false };
+	Point2f m_CameraPos;
 
 	float m_TotalElapsedSec;
 
