@@ -15,11 +15,12 @@ public:
 
 	void Draw();
 	void Update(float elapsedSec, float totalElapsedSec, float ground);
-	void Move(bool leftState, bool rightState, bool borderRight);
+	void Move(bool borderRight);
 
 	bool GetJumpState();
 	Direction GetRunState();
 	bool GetAttackState();
+	Point2f GetPos();
 
 	void SetJumpState(bool newJS);
 	void SetRunState(Direction newRS);

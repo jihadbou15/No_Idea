@@ -65,15 +65,16 @@ void Game::Update( float elapsedSec )
 	}
 
 
-	Player1.Move(m_LeftState, m_RightState,m_BorderRight);
-	PlayerPos=Player1.GivePlayerPos();
+	m_Player1.Move(m_BorderRight);
+	Point2f PlayerPos =m_Player1.GetPos();
+	
 	if (PlayerPos.x >= (m_Window.width / 2 + 20))
 	{
 		++m_CameraPos.x;
 		m_BorderRight = true;
 		PlayerPos.x = (m_Window.width / 2 + 20);
 		
-}
+	}
 	else
 	{
 		m_BorderRight = false;
@@ -81,16 +82,16 @@ void Game::Update( float elapsedSec )
 	Surface1.Update(m_CameraPos);
 }
 
-void Game::Draw( )
+void Game::Draw()
 {
-	ClearBackground( );
+	ClearBackground();
 	m_Player1.Draw();
 	Surface1.Draw();
 	for (int i = 0; i < m_NrElements; i++)
 	{
 		m_pLevelFloor[i]->Draw();
-	
-}
+
+	}
 }
 
 void Game::ProcessKeyDownEvent( const SDL_KeyboardEvent & e )
@@ -120,7 +121,7 @@ void Game::ProcessKeyDownEvent( const SDL_KeyboardEvent & e )
 	}
 		
 }
-}
+
 
 void Game::ProcessKeyUpEvent( const SDL_KeyboardEvent& e )
 {

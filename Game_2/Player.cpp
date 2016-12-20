@@ -170,6 +170,11 @@ bool Player::GetAttackState()
 	return m_AttackState;
 }
 
+Point2f Player::GetPos()
+{
+	return m_Pos;
+}
+
 void Player::SetJumpState(bool newJS)
 {
 	m_JumpState = newJS;
@@ -291,17 +296,17 @@ void Player::CheckAttackFrame()
 	}
 
 }
-void Player::Move(bool leftState, bool rightState, bool borderRight)
+void Player::Move( bool borderRight)
 {
 	if (borderRight == false)
 	{
-		if (leftState == true)
+		if (m_RunState == Direction::Right)
 		{
 			++m_Pos.x;
 		}
-		else
-			if (rightState == true)
-			{
-				--m_Pos.x;
-			}
+		else if (m_RunState == Direction::Left)
+		{
+			--m_Pos.x;
+		}
 	}
+}
