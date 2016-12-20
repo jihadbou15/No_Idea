@@ -217,4 +217,11 @@ namespace dae
 		glEnd( );
 	}
 
+	int GetIndex(int iRow, int iColumn, int columns)
+	{
+		int index{ (iRow * columns) + iColumn };
+
+		return index;
+	}
+
 }

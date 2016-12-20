@@ -21,6 +21,7 @@ public:
 private:
 	//DATA MEMBERS
 	GLuint m_Id{};
+
 	float m_Width{ 10.0f };
 	float m_Height{ 10.0f };
 	bool m_CreationOk{};

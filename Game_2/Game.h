@@ -1,6 +1,10 @@
 #pragma once
 #include <iostream>
 #include "Player.h"
+#include "Element.h"
+
+
+
 #include "Surface.h"
 class Game
 {
@@ -20,17 +24,25 @@ public:
 	void ProcessMouseDownEvent( const SDL_MouseButtonEvent& e );
 	void ProcessMouseUpEvent( const SDL_MouseButtonEvent& e );
 
+	
+	
+
 private:
 	// DATA MEMBERS
 	Window m_Window;
 
-	bool m_JumpState{ false };
-	bool m_LeftState{ false };
-	bool m_RightState{ false };
+	//Player
+	Player m_Player1;
+	float m_TotalElapsedSec;
+
+	//Level
+	static const int m_NrElements{ 100 };
+	Element* m_pLevelFloor[m_NrElements];
+	
 	bool m_BorderRight{ false };
 	Point2f m_CameraPos;
 
-	float m_TotalElapsedSec;
+	//
 
 	// FUNCTIONS
 	void Initialize( );
