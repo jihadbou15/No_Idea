@@ -139,14 +139,14 @@ void Player::Update(float elapsedSec, float totalElapsedSec, float ground)
 		else
 		{
 			m_rFrameCounter++;
-			if (m_rFrameCounter > 30)
+			if (m_rFrameCounter > 500)
 			{
 				m_RunFrameNr++;
 				if (m_RunFrameNr > 8)
 				{
 					m_RunFrameNr = 1;
 				}
-				
+				m_rFrameCounter = 0;
 			}
 			
 		}
