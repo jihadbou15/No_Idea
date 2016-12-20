@@ -7,15 +7,15 @@ int Player::m_InstanceCounter{};
 
 
 Player::Player()
-	:m_Pos{10.0f,10.0f}
+	:m_Pos{ 10.0f,10.0f }
 {
 }
 
 Player::Player(float x, float y)
-	:m_Pos{x,y},
-	 m_Frame{0.0f,0.0f,25.0f,25.0f}
+	: m_Pos{ x,y },
+	m_Frame{ 0.0f,0.0f,25.0f,25.0f }
 {
-	
+
 	if (m_InstanceCounter == 0)
 	{
 		m_pTex = new Texture{ "./DAE_Sprites/DAE_Sprites_Knight.png" };
@@ -31,7 +31,7 @@ Player::~Player()
 	{
 		delete m_pTex;
 		m_pTex = nullptr;
-		}
+	}
 }
 
 void Player::Draw()
@@ -50,26 +50,26 @@ void Player::Draw()
 		{
 			CheckRunFrame();
 		}
-		else if(m_RunState == Direction::Stationary)
+		else if (m_RunState == Direction::Stationary)
 		{
 			m_Frame.bottom = 0.0f,
-			m_Frame.left = 0.0f;
+				m_Frame.left = 0.0f;
 			m_RunFrameNr = 0;
 		}
-		m_pTex->Draw(Rectf{m_Pos.x,m_Pos.y,m_TexPartSizeW *2,m_TexPartSizeH*2}, m_Frame);
+		m_pTex->Draw(Rectf{ m_Pos.x,m_Pos.y,m_TexPartSizeW * 2,m_TexPartSizeH * 2 }, m_Frame);
 	}
 	else
 	{
 		glBegin(GL_QUADS);
 		glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
 		glVertex2f(m_Pos.x, m_Pos.y);
-		glVertex2f(m_Pos.x+m_TexPartSizeW, m_Pos.y);
-		glVertex2f(m_Pos.x+ m_TexPartSizeW, m_Pos.y+ m_TexPartSizeH);
-		glVertex2f(m_Pos.x, m_Pos.y+ m_TexPartSizeH);
+		glVertex2f(m_Pos.x + m_TexPartSizeW, m_Pos.y);
+		glVertex2f(m_Pos.x + m_TexPartSizeW, m_Pos.y + m_TexPartSizeH);
+		glVertex2f(m_Pos.x, m_Pos.y + m_TexPartSizeH);
 
 		glEnd();
 	}
-	
+
 }
 
 void Player::Update(float elapsedSec, float totalElapsedSec, float ground)
@@ -100,7 +100,7 @@ void Player::Update(float elapsedSec, float totalElapsedSec, float ground)
 			}
 			m_aFrameCounter = 0;
 		}
-		
+
 	}
 	if (m_JumpState)
 	{
@@ -119,7 +119,7 @@ void Player::Update(float elapsedSec, float totalElapsedSec, float ground)
 			{
 				m_JumpFrameNr = 2;
 			}
-	
+
 			if (m_Pos.y <= ground)
 			{
 				m_Pos.y = ground;
@@ -127,7 +127,7 @@ void Player::Update(float elapsedSec, float totalElapsedSec, float ground)
 				m_JumpState = false;
 			}
 		}
-		
+
 	}
 
 	if (m_RunState != Direction::Stationary)
@@ -139,18 +139,18 @@ void Player::Update(float elapsedSec, float totalElapsedSec, float ground)
 		else
 		{
 			m_rFrameCounter++;
-			if (m_rFrameCounter > 500)
+			if (m_rFrameCounter > 5)
 			{
 				m_RunFrameNr++;
 				if (m_RunFrameNr > 8)
 				{
-					m_RunFrameNr = 1;
+					m_RunFrameNr = 0;
 				}
 				m_rFrameCounter = 0;
 			}
-			
+
 		}
-		
+
 		m_Pos.x += speed*elapsedSec;
 	}
 }
@@ -195,20 +195,20 @@ void Player::CheckJumpFrame()
 		break;
 
 	case 1:
-		m_Frame.bottom =0.0f;
+		m_Frame.bottom = 0.0f;
 		m_Frame.left = m_TexPartSizeW;
 		break;
 
 	case 2:
 		m_Frame.bottom = 0.0f;
-		m_Frame.left = m_TexPartSizeW*2;
+		m_Frame.left = m_TexPartSizeW * 2;
 		break;
 
 	case 3:
-		m_Frame.bottom =0.0f;
-		m_Frame.left = m_TexPartSizeW*3;
+		m_Frame.bottom = 0.0f;
+		m_Frame.left = m_TexPartSizeW * 3;
 		break;
-	
+
 	default:
 		break;
 	}
@@ -231,30 +231,37 @@ void Player::CheckRunFrame()
 	case 2:
 		m_Frame.bottom = m_TexPartSizeH;
 		m_Frame.left = m_TexPartSizeW;
+		break;
 
 	case 3:
 		m_Frame.bottom = m_TexPartSizeH;
 		m_Frame.left = m_TexPartSizeW * 2;
+		break;
 
 	case 4:
 		m_Frame.bottom = m_TexPartSizeH;
 		m_Frame.left = m_TexPartSizeW * 3;
+		break;
 
 	case 5:
 		m_Frame.bottom = m_TexPartSizeH;
 		m_Frame.left = m_TexPartSizeW * 4;
+		break;
 
 	case 6:
 		m_Frame.bottom = m_TexPartSizeH;
 		m_Frame.left = m_TexPartSizeW * 5;
+		break;
 
 	case 7:
 		m_Frame.bottom = m_TexPartSizeH;
 		m_Frame.left = m_TexPartSizeW * 6;
+		break;
 
 	case 8:
 		m_Frame.bottom = m_TexPartSizeH;
 		m_Frame.left = m_TexPartSizeW * 7;
+		break;
 	}
 }
 
@@ -268,7 +275,7 @@ void Player::CheckAttackFrame()
 		break;
 
 	case 1:
-		m_Frame.bottom = m_TexPartSizeH*2;
+		m_Frame.bottom = m_TexPartSizeH * 2;
 		m_Frame.left = m_TexPartSizeW * 4;
 		break;
 
@@ -283,4 +290,3 @@ void Player::CheckAttackFrame()
 		break;
 	}
 }
-

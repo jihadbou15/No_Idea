@@ -75,33 +75,33 @@ void Game::Draw( )
 
 void Game::ProcessKeyDownEvent( const SDL_KeyboardEvent & e )
 {
-	std::cout << "KEYDOWN event: " << e.keysym.sym << std::endl;
+	//std::cout << "KEYDOWN event: " << e.keysym.sym << std::endl;
 	switch (e.keysym.sym)
 	{
 	case SDLK_UP:
-		std::cout << "Jump" << std::endl;
+		//std::cout << "Jump" << std::endl;
 		if (!m_Player1.GetJumpState())
 		{
 			m_Player1.SetJumpState(true);
 		}
 		break;
 	case SDLK_LEFT:
-		std::cout << "Left" << std::endl;
+		//std::cout << "Left" << std::endl;
 		m_Player1.SetRunState(Direction::Left);
 		break;
 	case SDLK_RIGHT:
-		std::cout << "Right" << std::endl;
+		//std::cout << "Right" << std::endl;
 		m_Player1.SetRunState(Direction::Right);
 		break;
 	case SDLK_z:
-		std::cout << "Attack" << std::endl;
+		//std::cout << "Attack" << std::endl;
 		m_Player1.SetAttackState(true);
 	}
 }
 
 void Game::ProcessKeyUpEvent( const SDL_KeyboardEvent& e )
 {
-	std::cout << "KEYUP event: " << e.keysym.sym << std::endl;
+	//std::cout << "KEYUP event: " << e.keysym.sym << std::endl;
 	switch ( e.keysym.sym )
 	{
 	case SDLK_LEFT:
