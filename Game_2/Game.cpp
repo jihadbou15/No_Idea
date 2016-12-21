@@ -50,20 +50,15 @@ void Game::Cleanup( )
 
 void Game::Update( float elapsedSec )
 {
-	m_TotalElapsedSec += elapsedSec;
-	
 	if (m_Player1.GetJumpState())
 	{
 		m_TotalElapsedSec += elapsedSec;
-		m_Player1.Update(elapsedSec,m_TotalElapsedSec, float{ (m_pLevelFloor[50]->GetPos().y) + m_pLevelFloor[50]->GetHeight()});
 	}
 	else
 	{
-
 		m_TotalElapsedSec = 0;
-		m_Player1.Update(elapsedSec,m_TotalElapsedSec, float{ (m_pLevelFloor[50]->GetPos().y) + m_pLevelFloor[50]->GetHeight() });
 	}
-
+	m_Player1.Update(elapsedSec, m_TotalElapsedSec, float{ (m_pLevelFloor[50]->GetPos().y) + m_pLevelFloor[50]->GetHeight() });
 
 	m_Player1.Move(m_BorderRight);
 	Point2f PlayerPos =m_Player1.GetPos();
@@ -79,7 +74,7 @@ void Game::Update( float elapsedSec )
 	{
 		m_BorderRight = false;
 	}
-	Surface1.Update(m_CameraPos);
+	Surface1.Update(m_CameraPos,m_Player1.GetRunState());
 }
 
 void Game::Draw()

@@ -2,6 +2,7 @@
 #include "Surface.h"
 
 
+
 Surface::Surface()
 {
 }
@@ -27,7 +28,11 @@ void Surface::Draw()
 	glEnd();
 }
 
-void Surface::Update(Point2f camera)
+void Surface::Update(Point2f camera, Direction player1)
 {
-	m_Pos.x -= camera.x;
+	if (player1 == Direction::Right)
+	{
+		m_Pos.x -= camera.x;
+	}
+	
 }

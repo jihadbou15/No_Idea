@@ -90,7 +90,7 @@ void Player::Update(float elapsedSec, float totalElapsedSec, float ground)
 	if (m_AttackState)
 	{
 		m_aFrameCounter++;
-		if (m_aFrameCounter > 240)
+		if (m_aFrameCounter > 5)
 		{
 			m_AttackFrameNr++;
 			if (m_AttackFrameNr > 3)
@@ -104,13 +104,10 @@ void Player::Update(float elapsedSec, float totalElapsedSec, float ground)
 	}
 	if (m_JumpState)
 	{
-		if (m_AttackState)
+		m_Pos.y += (m_JumpVelocity - (5.0f*totalElapsedSec));
+		if (!m_AttackState)
 		{
-			m_Pos.y += (m_JumpVelocity - (5.0f*totalElapsedSec));
-		}
-		else
-		{
-			m_Pos.y += (m_JumpVelocity - (5.0f*totalElapsedSec));
+
 			if (m_JumpVelocity - (5.0f*totalElapsedSec) > 0)
 			{
 				m_JumpFrameNr = 1;
@@ -120,14 +117,15 @@ void Player::Update(float elapsedSec, float totalElapsedSec, float ground)
 				m_JumpFrameNr = 2;
 			}
 
-			if (m_Pos.y <= ground)
+			if (m_Pos.y < ground)
 			{
 				m_Pos.y = ground;
 				m_JumpFrameNr = 3;
 				m_JumpState = false;
 			}
+		
 		}
-
+		
 	}
 
 	if (m_RunState != Direction::Stationary)

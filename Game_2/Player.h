@@ -40,7 +40,7 @@ private:
 	Point2f m_Pos;
 	Rectf m_Frame;
 
-	float m_JumpVelocity{ 1.0f };
+	float m_JumpVelocity{ 5.0f };
 	float m_Speed{ 100.0f };
 
 	const float m_TexPartSizeH{ 23.75f };

@@ -39,11 +39,12 @@ private:
 	static const int m_NrElements{ 100 };
 	Element* m_pLevelFloor[m_NrElements];
 	
-	bool m_BorderRight{ false };
-	Point2f m_CameraPos;
+	
 
 	//
-
+	bool m_BorderRight{ false };
+	Point2f m_CameraPos;
+	
 	// FUNCTIONS
 	void Initialize( );
 	void Cleanup( );
