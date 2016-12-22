@@ -2,10 +2,8 @@
 #include <iostream>
 #include "Player.h"
 #include "Element.h"
+#include "Texture.h"
 
-
-
-#include "Surface.h"
 class Game
 {
 public:
@@ -36,17 +34,33 @@ private:
 	float m_TotalElapsedSec;
 
 	//Level
-	static const int m_NrElements{ 100 };
-	Element* m_pLevelFloor[m_NrElements];
-	
-	
+	static const int m_NrElementsFloor{ 100 };
+	static const int m_NrElementsGrass{25};
+	static const int m_NrTrees{ 12 };
 
-	//
-	bool m_BorderRight{ false };
-	Point2f m_CameraPos;
+	Element* m_pLevelFloor[m_NrElementsFloor];
+	Element* m_pLevelGrass[m_NrElementsGrass];
+	Element* m_pLevelTreeA;
+	Element* m_pLevelTreeB;
+	Element* m_pLevelTreeC;
+
+	Point2f m_posTree[m_NrTrees]{};
+	const float m_Gravity{ -5.0f };
+	
+	//Level Hitbox
+	Rectf m_Floor;
+	Rectf m_Platform1;
+	Rectf m_Platform2;
+	Rectf m_Platform3;
+
+	//Background
+	Texture* m_Background;
 	
 	// FUNCTIONS
 	void Initialize( );
+	void InitializeFloor();
+	void InitializeGrass();
+	void InitializeTrees();
 	void Cleanup( );
 	void ClearBackground( );
 };

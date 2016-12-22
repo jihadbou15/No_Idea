@@ -1,9 +1,7 @@
 #include "stdafx.h"
 #include "Game.h"
-
 #include "utils.h"
 
-Surface Surface1{700.0f,50.0f};
 
 
 
@@ -22,8 +20,16 @@ Game::~Game( )
 
 void Game::Initialize( )
 {
-	Rectf floorTexBase{ Element::GetSize()*2.0f,Element::GetSize() * 2,Element::GetSize(),Element::GetSize()};
-	Rectf floorWorld{ 0.0f,0.0f,Element::GetSize() * 2.0f,Element::GetSize() * 2.0f };
+	m_Background = new Texture{ "./DAE_Sprites/background.png" };
+	InitializeFloor();
+	InitializeGrass();
+	InitializeTrees();     
+}
+
+void Game::InitializeFloor()
+{
+	Rectf floorTexBase{ Element::GetSize()*2.0f,Element::GetSize() * 2,Element::GetSize(),Element::GetSize() };
+	Rectf floorWorld{ 0.0f,0.0f,Element::GetSize()*2,Element::GetSize()*2 };
 	int rows{ 2 };
 	int columns{ 50 };
 	for (int i = 0; i < rows; i++)
@@ -32,23 +38,68 @@ void Game::Initialize( )
 		{
 			m_pLevelFloor[dae::GetIndex(i, j, columns)] = new Element{ floorTexBase,floorWorld };
 			floorWorld.left += floorWorld.width;
-}
+		}
 		floorWorld.left = 0.0f;
 		floorWorld.bottom += floorWorld.height;
 		floorTexBase.bottom -= floorTexBase.height;
 	}
 }
 
+void Game::InitializeGrass()
+{
+	Rectf floorTexBase{ 0.0f,0.0f,Element::GetSize()*14,Element::GetSize() };
+	Rectf floorWorld{ 0.0f,Element::GetSize() * 4 ,Element::GetSize() *14,Element::GetSize() };
+	for (int i = 0; i < m_NrElementsGrass; i++)
+	{
+		m_pLevelGrass[i] = new Element{ floorTexBase,floorWorld };
+		floorWorld.left += floorWorld.width;
+	}
+}
+
+void Game::InitializeTrees()
+{
+	Rectf Tree_A{ Element::GetSize() * 5,Element::GetSize() * 5,Element::GetSize() * 2,Element::GetSize() * 3 };
+	Rectf Tree_B{ Element::GetSize() * 7,Element::GetSize() * 4,Element::GetSize() * 3,Element::GetSize() * 4 };
+	Rectf Tree_C{ Element::GetSize() * 10,Element::GetSize() * 4,Element::GetSize() * 2,Element::GetSize() * 4 };
+
+	m_pLevelTreeA = new Element{ Tree_A };
+	m_pLevelTreeB = new Element{ Tree_B };
+	m_pLevelTreeC = new Element{ Tree_C };
+
+	
+	for (int i = 0; i < m_NrTrees; i++)
+	{
+		m_posTree[i].y = 64.0f;
+		m_posTree[i].x = 50.0f*i;
+	}
+}
+
 void Game::Cleanup( )
 {
-	for (int i = 0; i < m_NrElements; i++)
+	for (int i = 0; i < m_NrElementsFloor; i++)
 	{
 		delete m_pLevelFloor[i];
 		m_pLevelFloor[i] = nullptr;
-}
+	}
+	for (size_t i = 0; i <m_NrElementsGrass; i++)
+	{
+		delete m_pLevelGrass[i];
+		m_pLevelGrass[i] = nullptr;
+	}
+	
+	delete m_Background;
+	delete m_pLevelTreeA;
+	delete m_pLevelTreeB;
+	delete m_pLevelTreeC;
+
+	m_pLevelTreeA = nullptr;
+	m_pLevelTreeB = nullptr;
+	m_pLevelTreeC = nullptr;
+	m_Background = nullptr;
+
 }
 
-void Game::Update( float elapsedSec )
+void Game::Update(float elapsedSec)
 {
 	if (m_Player1.GetJumpState())
 	{
@@ -58,35 +109,35 @@ void Game::Update( float elapsedSec )
 	{
 		m_TotalElapsedSec = 0;
 	}
-	m_Player1.Update(elapsedSec, m_TotalElapsedSec, float{ (m_pLevelFloor[50]->GetPos().y) + m_pLevelFloor[50]->GetHeight() });
-
-	m_Player1.Move(m_BorderRight);
-	Point2f PlayerPos =m_Player1.GetPos();
-	
-	if (PlayerPos.x >= (m_Window.width / 2 + 20))
-	{
-		++m_CameraPos.x;
-		m_BorderRight = true;
-		PlayerPos.x = (m_Window.width / 2 + 20);
-		
-	}
-	else
-	{
-		m_BorderRight = false;
-	}
-	Surface1.Update(m_CameraPos,m_Player1.GetRunState());
+	m_Player1.Update(elapsedSec, m_Gravity, float{ (m_pLevelFloor[50]->GetPos().y) + m_pLevelFloor[50]->GetHeight() });
 }
 
 void Game::Draw()
 {
+	
 	ClearBackground();
-	m_Player1.Draw();
-	Surface1.Draw();
-	for (int i = 0; i < m_NrElements; i++)
+ 	m_Background->Draw(Rectf{0.0f,0.0f,m_Window.width,m_Window.height});
+
+	for (int i = 0; i < m_NrElementsFloor; i++)
 	{
 		m_pLevelFloor[i]->Draw();
-
 	}
+
+	for (int i = 0; i < m_NrTrees/4; i++)
+	{
+		m_pLevelTreeA->Draw(m_posTree[i]);
+		m_pLevelTreeB->Draw(m_posTree[i + 4]);
+		m_pLevelTreeC->Draw(m_posTree[i + 8]);
+	}
+
+	m_Player1.Draw();
+	
+	for (int i = 0; i < m_NrElementsGrass; i++)
+	{
+		m_pLevelGrass[i]->Draw();
+	}
+
+	
 }
 
 void Game::ProcessKeyDownEvent( const SDL_KeyboardEvent & e )
