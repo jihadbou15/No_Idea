@@ -224,4 +224,48 @@ namespace dae
 		return index;
 	}
 
+	bool isOverLapping(const Rectf & shape1, const Rectf & shape2)
+	{
+		float xDistance{ shape2.left - shape1.left };
+		float yDistance{ shape2.bottom - shape1.bottom };
+
+		if ((xDistance <= shape1.width && yDistance <= shape1.height))
+		{
+			return true;
+		}
+		else if (xDistance >= -shape2.width && yDistance >= -shape2.height)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	bool IsPointInRect(const Point2f & point, const Rectf & rect)
+	{
+		if (point.x <= (rect.left + rect.width) && point.y <= (rect.bottom + rect.height) && point.x > rect.left && point.y > rect.bottom)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	void DrawFilledRect(const Rectf & rectangle, const Color4f & color)
+	{
+		glBegin(GL_POLYGON);
+		glColor4f(color.r, color.g, color.b, color.a);
+
+		glVertex2f(rectangle.left, rectangle.bottom);
+		glVertex2f(rectangle.left + rectangle.width, rectangle.bottom);
+		glVertex2f(rectangle.left + rectangle.width, rectangle.bottom + rectangle.height);
+		glVertex2f(rectangle.left, rectangle.bottom + rectangle.height);
+
+		glEnd();
+	}
+
 }

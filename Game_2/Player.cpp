@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Player.h"
 #include "Texture.h"
+#include "utils.h"
 
 Texture* Player::m_pTex{ nullptr };
 int Player::m_InstanceCounter{};
@@ -13,13 +14,13 @@ Player::Player()
 
 Player::Player(float x, float y)
 	: m_Pos{ x,y },
-	m_Frame{ 0.0f,0.0f,25.0f,25.0f }
+	m_WorldRect{m_Pos.x,m_Pos.y,m_TexPartSizeW*2,m_TexPartSizeH*2}
 {
 
 	if (m_InstanceCounter == 0)
 	{
 		m_pTex = new Texture{ "./DAE_Sprites/DAE_Sprites_Knight.png" };
-}
+	}
 	m_InstanceCounter++;
 }
 
@@ -36,6 +37,7 @@ Player::~Player()
 
 void Player::Draw()
 {
+	m_WorldRect = Rectf{m_Pos.x,m_Pos.y,m_WorldRect.width,m_WorldRect.height};
 	if (m_pTex->IsCreationOk())
 	{
 		if (m_AttackState)
@@ -52,45 +54,49 @@ void Player::Draw()
 		}
 		else if (m_RunState == Direction::Stationary)
 		{
-			m_Frame.bottom = 0.0f,
-				m_Frame.left = 0.0f;
+			m_Frame.bottom = 0.0f;
+			m_Frame.left = 0.0f;
 			m_RunFrameNr = 0;
 		}
-		m_pTex->Draw(Rectf{ m_Pos.x,m_Pos.y,m_TexPartSizeW * 2,m_TexPartSizeH * 2 }, m_Frame);
+		m_pTex->Draw(m_WorldRect, m_Frame);
 	}
 	else
 	{
 	glBegin(GL_QUADS);
 	glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
 	glVertex2f(m_Pos.x, m_Pos.y);
-		glVertex2f(m_Pos.x + m_TexPartSizeW, m_Pos.y);
-		glVertex2f(m_Pos.x + m_TexPartSizeW, m_Pos.y + m_TexPartSizeH);
-		glVertex2f(m_Pos.x, m_Pos.y + m_TexPartSizeH);
+	glVertex2f(m_Pos.x + m_TexPartSizeW, m_Pos.y);
+	glVertex2f(m_Pos.x + m_TexPartSizeW, m_Pos.y + m_TexPartSizeH);
+	glVertex2f(m_Pos.x, m_Pos.y + m_TexPartSizeH);
 
 	glEnd();
 }
 
 }
 
-void Player::Update(float elapsedSec, float totalElapsedSec, float ground)
+void Player::Update(float elapsedSec, float gravity, Rectf ground)
 {
-	float speed{};
+	m_PrevPos = m_Pos;
 	switch (m_RunState)
 	{
 	case Direction::Stationary:
 		break;
 	case Direction::Left:
-		speed = -m_Speed;
+		m_Velocity = -m_Acceleration;
 		break;
 	case Direction::Right:
-		speed = m_Speed;
+		m_Velocity = m_Acceleration;
 		break;
 	}
 
 	if (m_AttackState)
 	{
+		if (m_AttackFrameNr == 0)
+		{
+			m_AttackFrameNr++;
+		}
 		m_aFrameCounter++;
-		if (m_aFrameCounter > 240)
+		if (m_aFrameCounter > 5)
 		{
 			m_AttackFrameNr++;
 			if (m_AttackFrameNr > 3)
@@ -104,14 +110,11 @@ void Player::Update(float elapsedSec, float totalElapsedSec, float ground)
 	}
 	if (m_JumpState)
 	{
-		if (m_AttackState)
+		m_JumpVelocity += gravity*elapsedSec;
+		m_Pos.y += m_JumpVelocity;
+		if (!m_AttackState)
 		{
-			m_Pos.y += (m_JumpVelocity - (5.0f*totalElapsedSec));
-		}
-		else
-		{
-			m_Pos.y += (m_JumpVelocity - (5.0f*totalElapsedSec));
-			if (m_JumpVelocity - (5.0f*totalElapsedSec) > 0)
+			if (m_JumpVelocity > 0)
 			{
 				m_JumpFrameNr = 1;
 			}
@@ -119,15 +122,16 @@ void Player::Update(float elapsedSec, float totalElapsedSec, float ground)
 			{
 				m_JumpFrameNr = 2;
 			}
-
-			if (m_Pos.y <= ground)
-			{
-				m_Pos.y = ground;
-				m_JumpFrameNr = 3;
-				m_JumpState = false;
-			}
 		}
 
+		if (m_Pos.y < ground.bottom+ground.height)
+		{
+			m_Pos.y = ground.bottom+ground.height;
+			m_JumpFrameNr = 3;
+			m_JumpState = false;
+			m_JumpVelocity = m_JumpAcceleration;
+		}
+		
 	}
 
 	if (m_RunState != Direction::Stationary)
@@ -144,14 +148,23 @@ void Player::Update(float elapsedSec, float totalElapsedSec, float ground)
 				m_RunFrameNr++;
 				if (m_RunFrameNr > 8)
 				{
-					m_RunFrameNr = 0;
+					m_RunFrameNr = 1;
 				}
 				m_rFrameCounter = 0;
 			}
 
 		}
 
-		m_Pos.x += speed*elapsedSec;
+		m_Pos.x += m_Velocity*elapsedSec;
+	}
+}
+
+void Player::CheckColl(Rectf obj)
+{
+	bool IsCollided{ dae::IsPointInRect(m_Pos,obj)};
+	if (IsCollided)
+	{
+		m_Pos = m_PrevPos;
 	}
 }
 
@@ -281,32 +294,38 @@ void Player::CheckAttackFrame()
 
 	case 1:
 		m_Frame.bottom = m_TexPartSizeH * 2;
-		m_Frame.left = m_TexPartSizeW * 4;
+		m_Frame.left = m_TexPartSizeW * 5;
 		break;
 
 	case 2:
 		m_Frame.bottom = m_TexPartSizeH * 2;
-		m_Frame.left = m_TexPartSizeW * 5;
+		m_Frame.left = m_TexPartSizeW * 6;
 		break;
 
 	case 3:
 		m_Frame.bottom = m_TexPartSizeH * 2;
-		m_Frame.left = (m_TexPartSizeW * 6);
+		m_Frame.left = (m_TexPartSizeW * 7);
 		break;
 	}
 
 }
-void Player::Move( bool borderRight)
+
+void Player::SetJumpVelocity(float NewJumpVel)
 {
-	if (borderRight == false)
-	{
-		if (m_RunState == Direction::Right)
-		{
-			++m_Pos.x;
-		}
-		else if (m_RunState == Direction::Left)
-		{
-			--m_Pos.x;
-		}
-	}
+	m_JumpVelocity = NewJumpVel;
+}
+
+void Player::SetVelocity(float NewVel)
+{
+	m_Velocity = NewVel;
+}
+
+float Player::GetJumpVelocity()
+{
+	return m_JumpVelocity;
+}
+
+float Player::GetVelocity()
+{
+	return m_Velocity;
 }

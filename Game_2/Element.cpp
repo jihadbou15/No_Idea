@@ -23,6 +23,11 @@ Element::Element(Point2f pos, Rectf rectWorld) :
 {
 }
 
+Element::Element(Rectf texPart) :
+	Element(texPart,Rectf{0.0f,0.0f,texPart.width,texPart.height})
+{
+}
+
 
 void Element::Draw()
 {
@@ -33,6 +38,15 @@ void Element::Draw()
 	
 }
 
+void Element::Draw(Point2f pos)
+{
+	SetRectWorld(pos);
+	if (m_IsDisplayed)
+	{
+		m_pTex->Draw(m_RectWorld, m_TexPart);
+	}
+}
+
 void Element::SetTextPart(Rectf textPart)
 {
 	m_TexPart = textPart;
@@ -41,6 +55,12 @@ void Element::SetTextPart(Rectf textPart)
 void Element::SetRectWorld(Rectf rectWorld)
 {
 	m_RectWorld = rectWorld;
+}
+
+void Element::SetRectWorld(Point2f pos)
+{
+	Rectf newRect{ pos.x,pos.y,m_RectWorld.width,m_RectWorld.height };
+	m_RectWorld = newRect;
 }
 
 void Element::SetDisplay(bool isDisplayed)

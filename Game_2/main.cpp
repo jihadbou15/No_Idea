@@ -9,7 +9,7 @@ int main( int argc, char *argv[] )
 	
 	StartHeapControl( );
 
-	Core core{ Window{ "WTF - Gaytard, Goatfucker- 1DAEXX", 640.0f, 360.0f} };
+	Core core{ Window{ "WTF - Gaytard, Goatfucker- 1DAEXX", 1280.0f, 720.0f} };
 	core.Run( );
 
 	return 0;
