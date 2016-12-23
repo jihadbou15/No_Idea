@@ -23,7 +23,8 @@ void Game::Initialize( )
 	m_Background = new Texture{ "./DAE_Sprites/background.png" };
 	InitializeFloor();
 	InitializeGrass();
-	InitializeTrees();     
+	InitializeTrees();
+	InitializeLasers();
 }
 
 void Game::InitializeFloor()
@@ -43,6 +44,9 @@ void Game::InitializeFloor()
 		floorWorld.bottom += floorWorld.height;
 		floorTexBase.bottom -= floorTexBase.height;
 	}
+
+	m_Floor = Rectf{ 0.0f,0.0f,Element::GetSize() * 4,Element::GetSize() * 4 };
+
 }
 
 void Game::InitializeGrass()
@@ -74,6 +78,25 @@ void Game::InitializeTrees()
 	}
 }
 
+void Game::InitializeLasers()
+{
+	Point2f size{ 200.0f,100.0f };
+	for (int i = 0; i < m_NrHL; i++)
+	{
+		m_HorizontalLasers[i] = Rectf{ 0.0f - size.x,m_Window.height - (300.0f * i), size.x,size.y };
+	}
+
+	for (int i = 0; i < m_NrVL; i++)
+	{
+		m_VerticalLasers[i] = Rectf{ m_Window.width - (300.0f * i),0.0f, size.y,size.x };
+	}
+
+	for (int i = 0; i < m_NrGL; i++)
+	{
+		m_GroundLasers[i] = Rectf{ m_Window.width - (400.0f * i),64.0f,size.x,size.y };
+	}
+}
+
 void Game::Cleanup( )
 {
 	for (int i = 0; i < m_NrElementsFloor; i++)
@@ -81,7 +104,7 @@ void Game::Cleanup( )
 		delete m_pLevelFloor[i];
 		m_pLevelFloor[i] = nullptr;
 	}
-	for (size_t i = 0; i <m_NrElementsGrass; i++)
+	for (int i = 0; i <m_NrElementsGrass; i++)
 	{
 		delete m_pLevelGrass[i];
 		m_pLevelGrass[i] = nullptr;
@@ -101,43 +124,127 @@ void Game::Cleanup( )
 
 void Game::Update(float elapsedSec)
 {
-	if (m_Player1.GetJumpState())
+	if (!m_info)
 	{
-		m_TotalElapsedSec += elapsedSec;
+		if (!m_lost)
+		{
+			if (m_Player1.GetJumpState())
+			{
+				m_TotalElapsedSec += elapsedSec;
+			}
+			else
+			{
+				m_TotalElapsedSec = 0;
+			}
+			m_Player1.Update(elapsedSec, m_Gravity, m_Floor);
+			UpdateLasers(elapsedSec);
+		}
 	}
-	else
+	
+	
+}
+
+void Game::UpdateLasers(float elapsedSec)
+{
+	for (int i = 0; i < m_NrHL; i++)
 	{
-		m_TotalElapsedSec = 0;
+		m_HorizontalLasers[i].left += m_LaserVelH*elapsedSec;
+		if (m_HorizontalLasers[i].left > m_Window.width)
+		{
+			m_HorizontalLasers[i].left = -m_HorizontalLasers[i].width;
+		}
 	}
-	m_Player1.Update(elapsedSec, m_Gravity, float{ (m_pLevelFloor[50]->GetPos().y) + m_pLevelFloor[50]->GetHeight() });
+
+	for (int i = 0; i < m_NrVL; i++)
+	{
+		m_VerticalLasers[i].bottom -= m_LaserVelV*elapsedSec;
+		if (m_VerticalLasers[i].bottom+ m_VerticalLasers[i].height < 0.0f)
+		{
+			m_VerticalLasers[i].bottom = m_Window.height;
+		}
+	}
+
+	for (int i = 0; i < m_NrGL; i++)
+	{
+		m_GroundLasers[i].left += m_LaserVelG*elapsedSec;
+		if (m_GroundLasers[i].left + m_GroundLasers[i].width < 0.0f)
+		{
+			m_GroundLasers[i].left = m_Window.width;
+		}
+	}
 }
 
 void Game::Draw()
 {
 	
 	ClearBackground();
- 	m_Background->Draw(Rectf{0.0f,0.0f,m_Window.width,m_Window.height});
-
-	for (int i = 0; i < m_NrElementsFloor; i++)
+	if (m_lost)
 	{
-		m_pLevelFloor[i]->Draw();
-	}
 
-	for (int i = 0; i < m_NrTrees/4; i++)
+	}
+	else if (m_info)
 	{
-		m_pLevelTreeA->Draw(m_posTree[i]);
-		m_pLevelTreeB->Draw(m_posTree[i + 4]);
-		m_pLevelTreeC->Draw(m_posTree[i + 8]);
-	}
 
-	m_Player1.Draw();
-	
-	for (int i = 0; i < m_NrElementsGrass; i++)
+	}
+	else
 	{
-		m_pLevelGrass[i]->Draw();
-	}
+		m_Background->Draw(Rectf{ 0.0f,0.0f,m_Window.width,m_Window.height });
 
-	
+		for (int i = 0; i < m_NrElementsFloor; i++)
+		{
+			m_pLevelFloor[i]->Draw();
+		}
+
+		int drawtree{};
+		for (int i = 0; i < m_NrTrees / 3; i++)
+		{
+			switch (drawtree)
+			{
+			case 0:
+				m_pLevelTreeA->Draw(m_posTree[i]);
+				drawtree++;
+				break;
+
+			case 1:
+				m_pLevelTreeB->Draw(m_posTree[i]);
+				drawtree;
+				break;
+
+			case 2:
+				m_pLevelTreeC->Draw(m_posTree[i]);
+				drawtree = 0;
+				break;
+
+			default:
+				break;
+			}
+
+
+
+		}
+
+
+		m_Player1.Draw();
+
+		for (int i = 0; i < m_NrElementsGrass; i++)
+		{
+			m_pLevelGrass[i]->Draw();
+		}
+		Color4f red{ 1.0f,0.0f,0.0f,0.80f };
+		for (int i = 0; i < m_NrHL; i++)
+		{
+			dae::DrawFilledRect(m_HorizontalLasers[i], red);
+		}
+		for (int i = 0; i < m_NrVL; i++)
+		{
+			dae::DrawFilledRect(m_VerticalLasers[i], red);
+		}
+		for (int i = 0; i < m_NrGL; i++)
+		{
+			dae::DrawFilledRect(m_GroundLasers[i], red);
+		}
+	}
+ 	
 }
 
 void Game::ProcessKeyDownEvent( const SDL_KeyboardEvent & e )
@@ -176,11 +283,18 @@ void Game::ProcessKeyUpEvent( const SDL_KeyboardEvent& e )
 	{
 	case SDLK_LEFT:
 		//std::cout << "Left arrow key released\n";
-		m_Player1.SetRunState(Direction::Stationary);
+		if (m_Player1.GetRunState() == Direction::Left)
+		{
+			m_Player1.SetRunState(Direction::Stationary);
+		}
+		
 		break;
 	case SDLK_RIGHT:
 		//std::cout << "`Right arrow key released\n";
-		m_Player1.SetRunState(Direction::Stationary);
+		if (m_Player1.GetRunState() == Direction::Right)
+		{
+			m_Player1.SetRunState(Direction::Stationary);
+		}
 		break;
 	case SDLK_1:
 	case SDLK_KP_1:

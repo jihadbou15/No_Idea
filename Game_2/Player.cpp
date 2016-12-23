@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Player.h"
 #include "Texture.h"
+#include "utils.h"
 
 Texture* Player::m_pTex{ nullptr };
 int Player::m_InstanceCounter{};
@@ -12,7 +13,8 @@ Player::Player()
 }
 
 Player::Player(float x, float y)
-	: m_Pos{ x,y }
+	: m_Pos{ x,y },
+	m_WorldRect{m_Pos.x,m_Pos.y,m_TexPartSizeW*2,m_TexPartSizeH*2}
 {
 
 	if (m_InstanceCounter == 0)
@@ -35,6 +37,7 @@ Player::~Player()
 
 void Player::Draw()
 {
+	m_WorldRect = Rectf{m_Pos.x,m_Pos.y,m_WorldRect.width,m_WorldRect.height};
 	if (m_pTex->IsCreationOk())
 	{
 		if (m_AttackState)
@@ -51,11 +54,11 @@ void Player::Draw()
 		}
 		else if (m_RunState == Direction::Stationary)
 		{
-			m_Frame.bottom = 0.0f,
-				m_Frame.left = 0.0f;
+			m_Frame.bottom = 0.0f;
+			m_Frame.left = 0.0f;
 			m_RunFrameNr = 0;
 		}
-		m_pTex->Draw(Rectf{ m_Pos.x,m_Pos.y,m_TexPartSizeW*2,m_TexPartSizeH*2 }, m_Frame);
+		m_pTex->Draw(m_WorldRect, m_Frame);
 	}
 	else
 	{
@@ -71,8 +74,9 @@ void Player::Draw()
 
 }
 
-void Player::Update(float elapsedSec, float gravity, float ground)
+void Player::Update(float elapsedSec, float gravity, Rectf ground)
 {
+	m_PrevPos = m_Pos;
 	switch (m_RunState)
 	{
 	case Direction::Stationary:
@@ -120,9 +124,9 @@ void Player::Update(float elapsedSec, float gravity, float ground)
 			}
 		}
 
-		if (m_Pos.y < ground)
+		if (m_Pos.y < ground.bottom+ground.height)
 		{
-			m_Pos.y = ground;
+			m_Pos.y = ground.bottom+ground.height;
 			m_JumpFrameNr = 3;
 			m_JumpState = false;
 			m_JumpVelocity = m_JumpAcceleration;
@@ -152,6 +156,15 @@ void Player::Update(float elapsedSec, float gravity, float ground)
 		}
 
 		m_Pos.x += m_Velocity*elapsedSec;
+	}
+}
+
+void Player::CheckColl(Rectf obj)
+{
+	bool IsCollided{ dae::IsPointInRect(m_Pos,obj)};
+	if (IsCollided)
+	{
+		m_Pos = m_PrevPos;
 	}
 }
 

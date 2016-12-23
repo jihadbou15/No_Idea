@@ -33,4 +33,7 @@ namespace dae
 
 
 	int GetIndex(int iRow, int iColumn, int columns);
+	bool isOverLapping(const Rectf &shape1, const Rectf &shape2);
+	bool IsPointInRect(const Point2f &point, const Rectf &rect);
+	void DrawFilledRect(const Rectf &rectangle, const Color4f &color);
 }
